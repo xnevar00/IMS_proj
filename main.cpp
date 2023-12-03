@@ -5,7 +5,6 @@
 //
 
 #include "skier.hpp"
-#include "intersections.hpp"
 
 class LyzarGenerator : public Event {
   void Behavior() {
@@ -18,7 +17,7 @@ class ChairLiftsGenerator : public Event {
   void Behavior() {
     (new BoardingLiftA)->Activate();
     (new BoardingLiftB)->Activate();
-    Activate(Time+10);
+    Activate(Time+15);
   }
 };
 
@@ -41,7 +40,7 @@ int main() {
   Print(" model2 - SIMLIB/C++ example\n");
   SetOutput("model2.out");
   
-  Init(0,2000);
+  Init(0,1000);
 
   Intersections& intersections = Intersections::getInstance();
   intersections.initIntersections();
