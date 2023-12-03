@@ -51,8 +51,8 @@ int main() {
   (new TBarsGenerator)->Activate();
   (new TBarsGenerator2)->Activate();
 
-  Run();
-  
+  Run(); 
+
   liftA_queue.Output();
   liftB_queue.Output();
   liftC_queue.Output();
