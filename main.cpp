@@ -5,6 +5,7 @@
 //
 
 #include "skier.hpp"
+#include "intersections.hpp"
 
 class LyzarGenerator : public Event {
   void Behavior() {
@@ -13,24 +14,51 @@ class LyzarGenerator : public Event {
   }
 };
 
-class NastupGenerator : public Event {
+class ChairLiftsGenerator : public Event {
   void Behavior() {
-    (new NastupMarcelka)->Activate();
-    (new NastupUSlona)->Activate();
+    (new BoardingLiftA)->Activate();
+    (new BoardingLiftB)->Activate();
     Activate(Time+10);
+  }
+};
+
+class TBarsGenerator : public Event {
+  void Behavior() {
+    (new BoardingLiftC)->Activate();
+    (new BoardingLiftD)->Activate();
+    Activate(Time+6);
+  }
+};
+
+class TBarsGenerator2 : public Event {
+  void Behavior() {
+    (new BoardingLiftE)->Activate();
+    Activate(Time+8);
   }
 };
 
 int main() {
   Print(" model2 - SIMLIB/C++ example\n");
   SetOutput("model2.out");
+  
   Init(0,2000);
+
+  Intersections& intersections = Intersections::getInstance();
+  intersections.initIntersections();
+
   (new LyzarGenerator)->Activate();
-  (new NastupGenerator)->Activate();
+  (new ChairLiftsGenerator)->Activate();
+  (new TBarsGenerator)->Activate();
+  (new TBarsGenerator2)->Activate();
+
   Run();
-  amalka.Output();
-  marcelka_queue.Output();
-  uslona_queue.Output();
+  
+  liftA_queue.Output();
+  liftB_queue.Output();
+  liftC_queue.Output();
+  liftD_queue.Output();
+  liftE_queue.Output();
+  liftF.Output();
   table.Output();
   SIMLIB_statistics.Output();
   return 0;

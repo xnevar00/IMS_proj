@@ -1,70 +1,103 @@
 #include "lift.hpp"
 
-Facility  amalka("Amalka");
-Queue marcelka_queue("MarcelkaQueue");
-Queue uslona_queue("U Slona Queue");
+Facility  liftF("Lift F");
+Queue liftB_queue("Lift B Queue");
+Queue liftA_queue("Lift A Queue");
+Queue liftC_queue("Lift C Queue");
+Queue liftD_queue("Lift D Queue");
+Queue liftE_queue("Lift E Queue");
 Histogram table("Table",0,25,20);
 
-void NastupMarcelka::Behavior(){
+void BoardingLiftB::Behavior(){
     Arrival = Time;
-    int pocet_lyzaru;
-    if (marcelka_queue.Length() > 50)
-    {
-      pocet_lyzaru = 4;
-    } else {
-      pocet_lyzaru = (int)Uniform(1,5);
-    }
-    if (marcelka_queue.empty()){
-      vypis = "Ve fronte je 0 lyzaru, lanovka odjizdi prazdna\n";
-      pocet_lyzaru = 0;
-      Print(vypis.c_str());
-    } else if (marcelka_queue.Length() < pocet_lyzaru){
-      vypis = "Nastupuje " + std::to_string(marcelka_queue.Length()) + " lyzaru\n";
-      Print(vypis.c_str());
-      pocet_lyzaru = marcelka_queue.Length();
-    } else {
-      vypis = "Nastupuje " + std::to_string(pocet_lyzaru) + " lyzaru\n";
-      Print(vypis.c_str());
-    }
-
-    for (int i = 0; i < pocet_lyzaru; i++){
-      lyzari_na_lanovce[i] = marcelka_queue.GetFirst();
-    }
-    Wait(278);
-    for (int i = 0; i < pocet_lyzaru; i++){
-      lyzari_na_lanovce[i]->Activate();
-    }
+    process_chairlift(278, &liftB_queue);
     table(Time-Arrival);
 };
 
-void NastupUSlona::Behavior(){
+void BoardingLiftA::Behavior(){
     Arrival = Time;
-    int pocet_lyzaru;
-    if (uslona_queue.Length() > 50)
-    {
-      pocet_lyzaru = 4;
-    } else {
-      pocet_lyzaru = (int)Uniform(1,5);
-    }
-    if (uslona_queue.empty()){
-      vypis = "Ve fronte je 0 lyzaru, lanovka odjizdi prazdna\n";
-      pocet_lyzaru = 0;
-      Print(vypis.c_str());
-    } else if (uslona_queue.Length() < pocet_lyzaru){
-      vypis = "Nastupuje " + std::to_string(uslona_queue.Length()) + " lyzaru\n";
-      Print(vypis.c_str());
-      pocet_lyzaru = uslona_queue.Length();
-    } else {
-      vypis = "Nastupuje " + std::to_string(pocet_lyzaru) + " lyzaru\n";
-      Print(vypis.c_str());
-    }
-
-    for (int i = 0; i < pocet_lyzaru; i++){
-      lyzari_na_lanovce[i] = uslona_queue.GetFirst();
-    }
-    Wait(450);
-    for (int i = 0; i < pocet_lyzaru; i++){
-      lyzari_na_lanovce[i]->Activate();
-    }
+    process_chairlift(450, &liftA_queue);
     table(Time-Arrival);
 };
+
+void BoardingLiftC::Behavior(){
+    Arrival = Time;
+    process_tbar(240, &liftC_queue);
+    table(Time-Arrival);
+};
+
+void BoardingLiftD::Behavior(){
+    Arrival = Time;
+    process_tbar(240, &liftD_queue);
+    table(Time-Arrival);
+};
+
+void BoardingLiftE::Behavior(){
+    Arrival = Time;
+    process_tbar(315, &liftE_queue);
+    table(Time-Arrival);
+};
+
+void Board::process_chairlift(int time, Queue *queue){
+    int skiers_count;
+    std::string log;
+    Entity *skiers_on_chairlift[SEATS_CHAIRLIFT];
+    if (queue->Length() > 50)
+    {
+      skiers_count = 4;
+    } else {
+      skiers_count = (int)Uniform(1,5);
+    }
+    if (queue->empty()){
+      log = "Ve fronte je 0 lyzaru, lanovka odjizdi prazdna\n";
+      skiers_count = 0;
+      Print(log.c_str());
+    } else if (queue->Length() < skiers_count){
+      log = "Nastupuje " + std::to_string(queue->Length()) + " lyzaru\n";
+      Print(log.c_str());
+      skiers_count = queue->Length();
+    } else {
+      log = "Nastupuje " + std::to_string(skiers_count) + " lyzaru\n";
+      Print(log.c_str());
+    }
+
+    for (int i = 0; i < skiers_count; i++){
+      skiers_on_chairlift[i] = queue->GetFirst();
+    }
+    Wait(time);
+    for (int i = 0; i < skiers_count; i++){
+      skiers_on_chairlift[i]->Activate();
+    }
+}
+
+void  Board::process_tbar(int time, Queue *queue){
+    int skiers_count;
+    std::string log;
+    Entity *skiers_on_chairlift[SEATS_TBAR];
+    if (queue->Length() > 50)
+    {
+      skiers_count = 2;
+    } else {
+      skiers_count = (int)Uniform(1,3);
+    }
+    if (queue->empty()){
+      log = "Ve fronte je 0 lyzaru, lanovka odjizdi prazdna\n";
+      skiers_count = 0;
+      Print(log.c_str());
+    } else if (queue->Length() < skiers_count){
+      log = "Nastupuje " + std::to_string(queue->Length()) + " lyzaru\n";
+      Print(log.c_str());
+      skiers_count = queue->Length();
+    } else {
+      log = "Nastupuje " + std::to_string(skiers_count) + " lyzaru\n";
+      Print(log.c_str());
+    }
+
+    for (int i = 0; i < skiers_count; i++){
+      skiers_on_chairlift[i] = queue->GetFirst();
+    }
+    Wait(time);
+    for (int i = 0; i < skiers_count; i++){
+      skiers_on_chairlift[i]->Activate();
+    }
+}

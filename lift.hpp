@@ -2,30 +2,67 @@
 #define LIFT_HPP
 #include "simlib.h"
 
-// global objects:
+#define SEATS_CHAIRLIFT 4
+#define SEATS_TBAR      2
 
-extern Facility amalka;
-extern Queue marcelka_queue;
-extern Queue uslona_queue;
+#define LIFTA_ENDINTERSECTIONID 7
+#define LIFTB_ENDINTERSECTIONID 4
+#define LIFTC_ENDINTERSECTIONID 11
+#define LIFTD_ENDINTERSECTIONID 6
+#define LIFTE_ENDINTERSECTIONID 5
+#define LIFTF_ENDINTERSECTIONID 12
+
+// global objects:
+extern Facility liftF;
+extern Queue liftB_queue;
+extern Queue liftA_queue;
+extern Queue liftC_queue;
+extern Queue liftD_queue;
+extern Queue liftE_queue;
 extern Histogram table;
 
-class NastupMarcelka: public Process {
 
+class Board: public Process {
 public:
-    void Behavior();
-private:
-    double Arrival;
-    Entity *lyzari_na_lanovce[4];
-    std::string vypis;
+    void Behaviour();
+protected:
+    void process_chairlift(int waitTime, Queue *queue);
+    void process_tbar(int waitTime, Queue *queue);
 };
 
-class NastupUSlona: public Process {
+class BoardingLiftB: public Board {
+public:
+    void Behavior();
+private:
+    double Arrival;
+};
+
+class BoardingLiftA: public Board {
 
 public:
     void Behavior();
 private:
     double Arrival;
-    Entity *lyzari_na_lanovce[4];
-    std::string vypis;
+};
+
+class BoardingLiftC: public Board {
+    public:
+    void Behavior();
+private:
+    double Arrival;
+};
+
+class BoardingLiftD: public Board {
+public:
+    void Behavior();
+private:
+    double Arrival;
+};
+
+class BoardingLiftE: public Board {
+public:
+    void Behavior();
+private:
+    double Arrival;
 };
 #endif
