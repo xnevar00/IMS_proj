@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////
+//                          IMS project
+//                           lift.cpp
+//    Lukas Vecerka (xvecer30), Veronika Nevarilova (xnevar00)
+//                            12/2023
+//
+
 #include "lift.hpp"
 
 Facility  liftF("Lift F");

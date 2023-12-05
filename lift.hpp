@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////
+//                          IMS project
+//                           lift.hpp
+//    Lukas Vecerka (xvecer30), Veronika Nevarilova (xnevar00)
+//                            12/2023
+//
+
 #ifndef LIFT_HPP
 #define LIFT_HPP
 #include "simlib.h"

@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //                          IMS project
+//                            main.cpp
 //    Lukas Vecerka (xvecer30), Veronika Nevarilova (xnevar00)
 //                            12/2023
 //
@@ -52,6 +53,14 @@ int main() {
 
   Run(); 
 
+  Marcelka.Output();
+  Hribek.Output();
+  Podbelka.Output();
+  Skalka.Output();
+  Slamenka.Output();
+  Terezka.Output();
+  USlona.Output();
+  KulatePeklo.Output();
   liftA_queue.Output();
   liftB_queue.Output();
   liftC_queue.Output();
