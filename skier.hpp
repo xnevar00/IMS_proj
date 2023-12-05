@@ -29,7 +29,7 @@ class Hunger : public Event {
   bool *hunger;
   public:
     Hunger(bool *hungerptr) : hunger(hungerptr) {
-      Activate(Time+Normal(600, 60));
+      Activate(Time+Normal(180*60, 40*60));
     }
     void Behavior();
 };

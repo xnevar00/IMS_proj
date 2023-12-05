@@ -10,7 +10,7 @@
 class LyzarGenerator : public Event {
   void Behavior() {
     (new Skier)->Activate();
-    Activate(Time+1);
+    Activate(Time+15);
   }
 };
 
@@ -18,7 +18,7 @@ class ChairLiftsGenerator : public Event {
   void Behavior() {
     (new BoardingLiftA)->Activate();
     (new BoardingLiftB)->Activate();
-    Activate(Time+15);
+    Activate(Time+120);
   }
 };
 
@@ -41,7 +41,7 @@ int main() {
   Print(" model2 - SIMLIB/C++ example\n");
   SetOutput("model2.out");
   
-  Init(0,1000);
+  Init(0,450*60);
 
   Intersections& intersections = Intersections::getInstance();
   intersections.initIntersections();

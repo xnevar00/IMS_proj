@@ -31,21 +31,17 @@ void Skier::Behavior()
     }
     // start skiing
     int counter = 0;
-    while(counter < 5){
-        /*if(hunger)
-        {
-            output = std::to_string(id()) + " Dostal jsem hlad, jdu najit restauraci\n";
-            Print(output.c_str());
-        } */
+    while(counter < 20){
+
         if (hunger)
         {
             if (skier_hunger != nullptr)
             {
-                delete skier_hunger;
+                output = std::to_string(id()) + " Dostal jsem hlad, jdu najit restauraci\n";
+                Print(output.c_str());
+                //delete skier_hunger;
                 skier_hunger = nullptr;
             }
-            output = std::to_string(id()) + " Dostal jsem hlad, jdu najit restauraci\n";
-            Print(output.c_str());
             // get all the restaurants at current intersection
             std::vector<Store *> restaurants = currentIntersection.restaurants;
             if (restaurants.size() == 0)
@@ -63,16 +59,17 @@ void Skier::Behavior()
                     Print(output.c_str());
                 } else 
                 {
-                    // choose random restaurant
+                    // choose random free restaurant
                     int rand = Random() * restaurants.size();
                     Store *restaurant = restaurants[rand];
                     restaurant->Enter(this, 1);
                     output = std::to_string(id()) + " Jdu do restaurace " + restaurant->Name() + "\n";
                     Print(output.c_str());
-                    Wait(Normal(60, 5));
+                    Wait(Normal(110*60, 20*60));
                     restaurant->Leave(1);
                     output = std::to_string(id()) + " Mnam mnam, bylo to moc dobry, jdu lyzovat dal.\n";
                     Print(output.c_str());
+                    hunger = false;
                 }
             }
         }
