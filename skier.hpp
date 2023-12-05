@@ -25,15 +25,6 @@
 #define LEVEL_INTERMEDIATE 0.55
 #define LEVEL_ADVANCED 0.3
 
-class Hunger : public Event {
-  bool *hunger;
-  public:
-    Hunger(bool *hungerptr) : hunger(hungerptr) {
-      Activate(Time+Normal(180*60, 40*60));
-    }
-    void Behavior();
-};
-
 struct Weights {
   double lift_comfort = 0.2;
   double lift_possible_ways = 0.45;
@@ -48,7 +39,7 @@ struct Weights {
 };
 
 class Skier : public Process { 
-
+public:
   struct IntersectionProbs {
     std::vector<std::pair<int, double>> probs;
   };
@@ -80,4 +71,14 @@ class Skier : public Process {
   void RideLift(Queue *queue);
   void RideLiftF();
 };
+
+class Hunger : public Event {
+  Skier *ptr;
+  public:
+    Hunger(Skier *p) : ptr(p) {
+      Activate(Time+Normal(100*60, 20*60));
+    }
+    void Behavior();
+};
+
 #endif

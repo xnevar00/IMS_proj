@@ -9,13 +9,13 @@
 
 void Hunger::Behavior()
 {
-    *hunger = true;
+      ptr->hunger = true;
 }
 
 void Skier::Behavior()
 {
     arrival = Time;
-    skier_hunger = new Hunger(&hunger);
+    skier_hunger = new Hunger(this);
 
     SetSkierLevel();
     CalculateIntersectionsProbs(); 
@@ -39,7 +39,7 @@ void Skier::Behavior()
             {
                 output = std::to_string(id()) + " Dostal jsem hlad, jdu najit restauraci\n";
                 Print(output.c_str());
-                //delete skier_hunger;
+                delete skier_hunger;
                 skier_hunger = nullptr;
             }
             // get all the restaurants at current intersection
@@ -68,7 +68,7 @@ void Skier::Behavior()
                     Wait(Normal(110*60, 20*60));
                     restaurant->Leave(1);
                     output = std::to_string(id()) + " Mnam mnam, bylo to moc dobry, jdu lyzovat dal.\n";
-                    Print(output.c_str());
+                    Print(output.c_str()); 
                     hunger = false;
                 }
             }
@@ -76,6 +76,11 @@ void Skier::Behavior()
         makeDecision();
         Move();
         counter++;
+    }
+    if (skier_hunger != nullptr)
+    {
+        delete skier_hunger;
+        skier_hunger = nullptr;
     }
 
     table(Time-arrival);

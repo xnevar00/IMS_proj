@@ -18,7 +18,7 @@ class ChairLiftsGenerator : public Event {
   void Behavior() {
     (new BoardingLiftA)->Activate();
     (new BoardingLiftB)->Activate();
-    Activate(Time+120);
+    Activate(Time+15);
   }
 };
 
