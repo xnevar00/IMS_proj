@@ -6,11 +6,45 @@
 //
 
 #include "skier.hpp"
+#include <random>
 
-class LyzarGenerator : public Event {
+
+class SkierGenerator : public Event {
+  public:
+  std::vector<double> event_times;
+
+  void generateEventTimes(int numEvents, double mean, double stddev) {
+    std::vector<double> events;
+
+    double event_value = 0.0;
+    for (int i = 0; i < numEvents; i++) {
+        event_value = Normal(mean, stddev);
+        events.push_back(event_value);
+    }
+
+    std::sort(events.begin(), events.end());
+
+    for (int i = 1; i < numEvents; ++i) {
+        double time = events[i] - events[i - 1];
+        event_times.push_back(time);
+    }
+
+    Print((std::to_string(event_times[0]) + "\n").c_str());
+    Print((std::to_string(event_times[1]) + "\n").c_str());
+    Print((std::to_string(event_times[2]) + "\n").c_str());
+    Print((std::to_string(event_times[3]) + "\n").c_str());
+    Print((std::to_string(event_times[4]) + "\n").c_str());
+
+  }
+
   void Behavior() {
+    static int index = 0;
     (new Skier)->Activate();
-    Activate(Time+15);
+    Print("vytvarim lyzare cislo %d\n", index);
+    if (index < event_times.size())
+    {
+        Activate(Time+event_times[index++]);
+    }
   }
 };
 
@@ -37,6 +71,8 @@ class TBarsGenerator2 : public Event {
   }
 };
 
+
+
 int main() {
   Print(" model2 - SIMLIB/C++ example\n");
   SetOutput("model2.out");
@@ -45,8 +81,10 @@ int main() {
 
   Intersections& intersections = Intersections::getInstance();
   intersections.initIntersections();
+  SkierGenerator *skierGen = new SkierGenerator();
+  skierGen->generateEventTimes(5000, 9000, 3000);
 
-  (new LyzarGenerator)->Activate();
+  skierGen->Activate();
   (new ChairLiftsGenerator)->Activate();
   (new TBarsGenerator)->Activate();
   (new TBarsGenerator2)->Activate();
