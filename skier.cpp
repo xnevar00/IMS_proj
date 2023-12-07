@@ -22,6 +22,7 @@ void Hunger::Behavior()
 void Leaving::Behavior()
 {
     ptr->leaving = true;
+    Print("kamo bez domu");
 }
 
 void Skier::Behavior()

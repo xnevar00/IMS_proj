@@ -97,7 +97,7 @@ class Leaving : public Event {
       int time_to_leave = CLOSING_TIME - 40*60 - round(Exponential(40*60));
       if (time_to_leave < Time || time_to_leave < 0)
       {
-        time_to_leave = Time + 1;
+        time_to_leave = 1;
       } else
       {
         time_to_leave = time_to_leave - Time;
