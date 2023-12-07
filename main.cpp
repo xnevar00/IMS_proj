@@ -9,6 +9,7 @@
 #include <random>
 
 
+
 class SkierGenerator : public Event {
   public:
   std::vector<double> event_times;
@@ -77,12 +78,12 @@ int main() {
   Print(" model2 - SIMLIB/C++ example\n");
   SetOutput("model2.out");
   
-  Init(0,450*60);
+  Init(0,CLOSING_TIME);
 
   Intersections& intersections = Intersections::getInstance();
   intersections.initIntersections();
   SkierGenerator *skierGen = new SkierGenerator();
-  skierGen->generateEventTimes(5000, 9000, 3000);
+  skierGen->generateEventTimes(4000, 12000, 4000);
 
   skierGen->Activate();
   (new ChairLiftsGenerator)->Activate();

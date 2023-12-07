@@ -9,13 +9,26 @@
 
 void Hunger::Behavior()
 {
-      ptr->hunger = true;
+    double willEat = Random();
+    if (willEat <= 0.5)
+    {
+        ptr->hunger = true;
+    } else
+    {
+        ptr->hunger = false;
+    }
+}
+
+void Leaving::Behavior()
+{
+    ptr->leaving = true;
 }
 
 void Skier::Behavior()
 {
     arrival = Time;
     skier_hunger = new Hunger(this);
+    skier_leaving = new Leaving(this);
 
     SetSkierLevel();
     CalculateIntersectionsProbs(); 
@@ -30,8 +43,9 @@ void Skier::Behavior()
         currentIntersection = Intersections::getInstance().getIntersectionById(1);
     }
     // start skiing
-    int counter = 0;
-    while(counter < 20){
+    output = std::to_string(id()) + " Narodil jsem se.\n";
+    Print(output.c_str());
+    while(!leaving){
 
         if (hunger)
         {
@@ -65,7 +79,7 @@ void Skier::Behavior()
                     restaurant->Enter(this, 1);
                     output = std::to_string(id()) + " Jdu do restaurace " + restaurant->Name() + "\n";
                     Print(output.c_str());
-                    Wait(Normal(110*60, 20*60));
+                    Wait(Normal(90*60, 15*60));
                     restaurant->Leave(1);
                     output = std::to_string(id()) + " Mnam mnam, bylo to moc dobry, jdu lyzovat dal.\n";
                     Print(output.c_str()); 
@@ -75,8 +89,9 @@ void Skier::Behavior()
         }
         makeDecision();
         Move();
-        counter++;
     }
+    output = std::to_string(id()) + " Jdu domu, uz jsem unaveny.\n";
+    Print(output.c_str());
     if (skier_hunger != nullptr)
     {
         delete skier_hunger;

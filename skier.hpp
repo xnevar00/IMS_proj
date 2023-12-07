@@ -25,6 +25,8 @@
 #define LEVEL_INTERMEDIATE 0.55
 #define LEVEL_ADVANCED 0.3
 
+#define CLOSING_TIME 450*60
+
 struct Weights {
   double lift_comfort = 0.2;
   double lift_possible_ways = 0.45;
@@ -46,6 +48,8 @@ public:
 
   bool hunger = false;
   Event *skier_hunger;
+  bool leaving = false;
+  Event *skier_leaving;
   double arrival;
   std::string output;
   Weights skier_weights;
@@ -77,6 +81,23 @@ class Hunger : public Event {
   public:
     Hunger(Skier *p) : ptr(p) {
       Activate(Time+Normal(100*60, 20*60));
+    }
+    void Behavior();
+};
+
+class Leaving : public Event {
+  Skier *ptr;
+  public:
+    Leaving(Skier *p) : ptr(p) {
+      int time_to_leave = CLOSING_TIME - round(Exponential(40*60));
+      if (time_to_leave < Time || time_to_leave < 0)
+      {
+        time_to_leave = Time + 1;
+      } else
+      {
+        time_to_leave = time_to_leave - Time;
+      }
+      Activate(Time + time_to_leave);
     }
     void Behavior();
 };
