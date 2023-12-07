@@ -25,6 +25,7 @@ struct Slope {
   int possible_ways;
   int special_entertainment;
   int time_to_cross;
+  std::vector<int> way_to_leaving_points_ids;
 };
 
 enum LiftType {
@@ -40,6 +41,7 @@ struct Lift {
   int lifts;
   int weather;
   double waiting_time;
+  std::vector<int> way_to_leaving_points_ids;
 };
 
 
@@ -58,6 +60,9 @@ public:
     void addRestaurant(const Store* restaurant);
 
     int GetTimeToCrossById(int id);
+
+    bool slopeLeadsToLeavingPoint(int slopeId, int leavingPointId);
+
 };
 
 

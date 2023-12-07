@@ -13,6 +13,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <numeric>
 #include "lift.hpp"
 #include "intersections.hpp"
 #include "restaurant.hpp"
@@ -40,17 +41,20 @@ struct Weights {
   double slope_special_entertainment = 0.15;
 };
 
+struct IntersectionProbs {
+    std::vector<std::pair<int, double>> probs;
+};
+
 class Skier : public Process { 
 public:
-  struct IntersectionProbs {
-    std::vector<std::pair<int, double>> probs;
-  };
 
   bool hunger = false;
   Event *skier_hunger;
   bool leaving = false;
   Event *skier_leaving;
   double arrival;
+  int entry_point_id;
+  bool leaving_complete = false;
   std::string output;
   Weights skier_weights;
   Intersection currentIntersection;
@@ -59,6 +63,7 @@ public:
   double skier_speed_coefficient = 1.0;
 
   void Behavior();
+  IntersectionProbs FilterOptions(IntersectionProbs probs);
   void makeDecision();
   void GoToAmalka();
   void GoToMarcelka();
@@ -89,7 +94,7 @@ class Leaving : public Event {
   Skier *ptr;
   public:
     Leaving(Skier *p) : ptr(p) {
-      int time_to_leave = CLOSING_TIME - round(Exponential(40*60));
+      int time_to_leave = CLOSING_TIME - 40*60 - round(Exponential(40*60));
       if (time_to_leave < Time || time_to_leave < 0)
       {
         time_to_leave = Time + 1;

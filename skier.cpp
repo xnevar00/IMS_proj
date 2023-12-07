@@ -37,15 +37,16 @@ void Skier::Behavior()
     double lift_choice = Random();
     if (lift_choice <= PST_AMALKA){
         currentIntersection = Intersections::getInstance().getIntersectionById(2);
+        entry_point_id = 2;
     } else if (lift_choice > PST_AMALKA && lift_choice <= PST_AMALKA + PST_USLONA) {
         currentIntersection = Intersections::getInstance().getIntersectionById(10);
+        entry_point_id = 10;
     } else {
         currentIntersection = Intersections::getInstance().getIntersectionById(1);
+        entry_point_id = 1;
     }
     // start skiing
-    output = std::to_string(id()) + " Narodil jsem se.\n";
-    Print(output.c_str());
-    while(!leaving){
+    while(!leaving_complete){
 
         if (hunger)
         {
@@ -79,6 +80,8 @@ void Skier::Behavior()
                     restaurant->Enter(this, 1);
                     output = std::to_string(id()) + " Jdu do restaurace " + restaurant->Name() + "\n";
                     Print(output.c_str());
+                    double waiting_time = Normal(90*60, 15*60);
+
                     Wait(Normal(90*60, 15*60));
                     restaurant->Leave(1);
                     output = std::to_string(id()) + " Mnam mnam, bylo to moc dobry, jdu lyzovat dal.\n";
@@ -89,9 +92,13 @@ void Skier::Behavior()
         }
         makeDecision();
         Move();
+        if (leaving && currentIntersection.intersectionId == entry_point_id)
+        {
+            leaving_complete = true;
+            output = std::to_string(id()) + " Dojel jsem tam z kama jsem prisel, odchazim.\n";
+            Print(output.c_str());
+        }
     }
-    output = std::to_string(id()) + " Jdu domu, uz jsem unaveny.\n";
-    Print(output.c_str());
     if (skier_hunger != nullptr)
     {
         delete skier_hunger;
@@ -157,8 +164,52 @@ void Skier::computeIntersectionProbabilities(std::vector<Lift> lifts, std::vecto
     }
 }
 
+IntersectionProbs Skier::FilterOptions(IntersectionProbs probs)
+{
+    int leavingPointId = this->entry_point_id;
+    double subtract_sum = 0.0;
+    double sum_of_probs = 0.0;
+    double prev_second = 0.0;
+    IntersectionProbs filtered_probs;
+
+    for (const auto& prob: probs.probs)
+    {
+        int slopeId = prob.first;
+        if (!currentIntersection.slopeLeadsToLeavingPoint(slopeId, leavingPointId))
+        {
+            subtract_sum += prob.second - prev_second;
+        } else {
+            filtered_probs.probs.push_back(std::make_pair(slopeId, prob.second - subtract_sum));
+            sum_of_probs += prob.second - subtract_sum;
+        }
+        prev_second = prob.second;
+    }
+
+    // if there are no choices leading to leaving point, nothing else to do here
+    if (filtered_probs.probs.size() == 0)
+    {
+        return filtered_probs;
+    }
+    // normalizing the distribution
+    double k = 1.0 / filtered_probs.probs.back().second;
+    for (auto& prob : filtered_probs.probs) {
+        prob.second *= k;
+    }
+
+    return filtered_probs;
+}
+
 void Skier::makeDecision(){
     IntersectionProbs probs = intersectionsProbs[currentIntersection.intersectionId];
+
+    if (leaving)
+    {
+        FilterOptions(probs);
+        if (probs.probs.size() == 0)
+        {
+            probs = intersectionsProbs[currentIntersection.intersectionId];
+        }
+    }
 
     double rand = Random();
 

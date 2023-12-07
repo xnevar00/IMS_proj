@@ -83,7 +83,7 @@ int main() {
   Intersections& intersections = Intersections::getInstance();
   intersections.initIntersections();
   SkierGenerator *skierGen = new SkierGenerator();
-  skierGen->generateEventTimes(4000, 12000, 4000);
+  skierGen->generateEventTimes(1000, 12000, 4000);
 
   skierGen->Activate();
   (new ChairLiftsGenerator)->Activate();
