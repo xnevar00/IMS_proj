@@ -19,8 +19,8 @@
 #include "restaurant.hpp"
 
 #define PST_AMALKA 0.05
-#define PST_MARCELKA 0.5
-#define PST_USLONA 0.45
+#define PST_MARCELKA 0.65
+#define PST_USLONA 0.3
 
 #define LEVEL_BEGINNER 0.15
 #define LEVEL_INTERMEDIATE 0.55
@@ -29,16 +29,16 @@
 #define CLOSING_TIME 450*60
 
 struct Weights {
-  double lift_comfort = 0.2;
-  double lift_possible_ways = 0.45;
-  double lift_lift_count = 0.15;
-  double lift_weather = -0.5;
-  double lift_queue = -0.15;
+  double lift_comfort = 0.15;
+  double lift_possible_ways = 0.28;
+  double lift_lift_count = 0.07;
+  double lift_weather = -0.05;
 
-  double slope_difficulty =0.25;
-  double slope_possible_lifts = 0.15;
-  double slope_possible_ways = 0.45;
-  double slope_special_entertainment = 0.15;
+  double slope_difficulty = 0.2;
+  double slope_possible_lifts = 0.10;
+  double slope_possible_ways = 0.20;
+  double slope_special_entertainment = 0.05;
+  double slope_max_possible_ways_from_lift = 0.45; 
 };
 
 struct IntersectionProbs {
@@ -64,12 +64,13 @@ public:
 
   void Behavior();
   IntersectionProbs FilterOptions(IntersectionProbs probs);
+  IntersectionProbs UpdateWeightsBasedOnQueues(IntersectionProbs probs);
   void makeDecision();
   void GoToAmalka();
   void GoToMarcelka();
   void GoToUSlona();
 
-  void SetSlopeWeights(double slope_difficulty, double slope_possible_lifts, double slope_possible_ways, double slope_special_entertainment);
+  void SetSlopeWeights(double slope_difficulty, double slope_possible_lifts, double slope_possible_ways, double slope_special_entertainment, double max_possible_ways_from_lift);
   void SetSkierLevel();
   void computeIntersectionProbabilities(std::vector<Lift> lifts, std::vector<Slope> slopes, std::vector<std::pair<int, double>> *cumulativeDist);
   void ChooseLiftB();
@@ -95,6 +96,8 @@ class Leaving : public Event {
   public:
     Leaving(Skier *p) : ptr(p) {
       int time_to_leave = CLOSING_TIME - 40*60 - round(Exponential(40*60));
+
+      // if the time to leave is less than the current time, leave immediately
       if (time_to_leave < Time || time_to_leave < 0)
       {
         time_to_leave = 1;

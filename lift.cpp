@@ -88,7 +88,7 @@ void  Board::process_tbar(int time, Queue *queue){
       skiers_count = (int)Uniform(1,3);
     }
     if (queue->empty()){
-      log = "Ve fronte je 0 lyzaru, lanovka odjizdi prazdna\n";
+      log = "Ve fronte je 0 lyzaru, kotva odjizdi prazdna\n";
       skiers_count = 0;
       Print(log.c_str());
     } else if (queue->Length() < skiers_count){

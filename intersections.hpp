@@ -15,8 +15,8 @@
 #include "simlib.h"
 
 #define DIFFICULTY_RED 1.0
-#define DIFFICULTY_BLUE 0.7
-#define DIFFICULTY_BLACK 0.4
+#define DIFFICULTY_BLUE 0.3
+#define DIFFICULTY_BLACK 0.2
 
 struct Slope {
   int slopeId;
@@ -26,6 +26,7 @@ struct Slope {
   int special_entertainment;
   int time_to_cross;
   std::vector<int> way_to_leaving_points_ids;
+  int max_possible_ways_from_lift;
 };
 
 enum LiftType {
@@ -40,7 +41,6 @@ struct Lift {
   int possible_ways;
   int lifts;
   int weather;
-  double waiting_time;
   std::vector<int> way_to_leaving_points_ids;
 };
 
@@ -75,6 +75,7 @@ private:
 public:
 
     static Intersections& getInstance();
+    std::map<int, double> queueWeights;
 
     void addIntersection(const Intersection& intersection);
 

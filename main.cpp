@@ -53,7 +53,7 @@ class ChairLiftsGenerator : public Event {
   void Behavior() {
     (new BoardingLiftA)->Activate();
     (new BoardingLiftB)->Activate();
-    Activate(Time+15);
+    Activate(Time+10);
   }
 };
 
@@ -72,6 +72,22 @@ class TBarsGenerator2 : public Event {
   }
 };
 
+/*void UpdateQueueWeights() {
+  Intersections& intersections = Intersections::getInstance();
+  intersections.queueWeights.insert(std::make_pair('A', liftA_queue.Length()/100));
+  intersections.queueWeights.insert(std::make_pair('B', liftB_queue.Length()/100));
+  intersections.queueWeights.insert(std::make_pair('C', liftC_queue.Length()/100));
+  intersections.queueWeights.insert(std::make_pair('D', liftD_queue.Length()/100));
+  intersections.queueWeights.insert(std::make_pair('E', liftE_queue.Length()/100));
+}
+
+class QueueChecker : public Process {
+  void Behavior() {
+      UpdateQueueWeights();
+      Activate(Time+2*60);
+  }
+};*/
+
 
 
 int main() {
@@ -83,12 +99,13 @@ int main() {
   Intersections& intersections = Intersections::getInstance();
   intersections.initIntersections();
   SkierGenerator *skierGen = new SkierGenerator();
-  skierGen->generateEventTimes(1000, 12000, 4000);
+  skierGen->generateEventTimes(1500, 12000, 4000);
 
   skierGen->Activate();
   (new ChairLiftsGenerator)->Activate();
   (new TBarsGenerator)->Activate();
   (new TBarsGenerator2)->Activate();
+  //(new QueueChecker)->Activate();
 
   Run(); 
 

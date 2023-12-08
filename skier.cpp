@@ -109,12 +109,13 @@ void Skier::Behavior()
     table(Time-arrival);
 }
 
-void Skier::SetSlopeWeights(double slope_difficulty, double slope_possible_lifts, double slope_possible_ways, double slope_special_entertainment)
+void Skier::SetSlopeWeights(double slope_difficulty, double slope_possible_lifts, double slope_possible_ways, double slope_special_entertainment, double max_possible_ways_from_lift)
 {
     skier_weights.slope_difficulty = slope_difficulty;
     skier_weights.slope_possible_lifts = slope_possible_lifts;
     skier_weights.slope_possible_ways = slope_possible_ways;
     skier_weights.slope_special_entertainment = slope_special_entertainment;
+    skier_weights.slope_max_possible_ways_from_lift = max_possible_ways_from_lift;
 }
 
 void Skier::SetSkierLevel()
@@ -123,16 +124,16 @@ void Skier::SetSkierLevel()
     if (skier_level < LEVEL_BEGINNER)
     {
         skier_speed_coefficient = 0.67;
-        SetSlopeWeights(0.6, 0.1, 0.3, 0.0);
+        SetSlopeWeights(0.5, 0.1, 0.2, 0.0, 0.2);
 
     } else if (skier_level < LEVEL_BEGINNER + LEVEL_INTERMEDIATE)
     {
         skier_speed_coefficient = 1.0;
-        SetSlopeWeights(0.25, 0.15, 0.45, 0.15);
+        SetSlopeWeights(0.2, 0.1, 0.2, 0.05, 0.45);
 
     } else {    //level advanced
         skier_speed_coefficient = 1.4;
-        SetSlopeWeights(0.15, 0.25, 0.3, 0.3);
+        SetSlopeWeights(0.3, 0.1, 0.1, 0.15, 0.35);
     }
 }
 
@@ -141,12 +142,16 @@ void Skier::computeIntersectionProbabilities(std::vector<Lift> lifts, std::vecto
     std::map<int, double> prob_lifts;
     std::map<int, double> prob_slopes;
     for (const Lift& lift : lifts) {
-        prob_lifts[lift.liftId] = lift.comfort * skier_weights.lift_comfort + lift.possible_ways * skier_weights.lift_possible_ways + lift.lifts * skier_weights.lift_lift_count + lift.weather * skier_weights.lift_weather + lift.waiting_time * skier_weights.lift_queue;
+        prob_lifts[lift.liftId] = 0.7 + lift.comfort * skier_weights.lift_comfort + lift.possible_ways * skier_weights.lift_possible_ways/3 + lift.lifts * skier_weights.lift_lift_count + lift.weather * skier_weights.lift_weather;
         sum += prob_lifts[lift.liftId];
     }
 
     for (const Slope& slope : slopes) {
-        prob_slopes[slope.slopeId] = slope.difficulty * skier_weights.slope_difficulty + slope.possible_lifts * skier_weights.slope_possible_lifts + slope.possible_ways * skier_weights.slope_possible_ways + slope.special_entertainment * skier_weights.slope_special_entertainment;
+        prob_slopes[slope.slopeId] = slope.difficulty * skier_weights.slope_difficulty 
+                                    + slope.possible_lifts * skier_weights.slope_possible_lifts 
+                                    + slope.possible_ways * skier_weights.slope_possible_ways 
+                                    + slope.special_entertainment * skier_weights.slope_special_entertainment 
+                                    + slope.max_possible_ways_from_lift * skier_weights.slope_max_possible_ways_from_lift;
         sum += prob_slopes[slope.slopeId];
     }
 
@@ -205,11 +210,16 @@ void Skier::makeDecision(){
 
     if (leaving)
     {
-        FilterOptions(probs);
+        probs = FilterOptions(probs);
         if (probs.probs.size() == 0)
         {
             probs = intersectionsProbs[currentIntersection.intersectionId];
         }
+    }
+    for (const auto& prob: probs.probs)
+    {
+        output = std::to_string(id()) + " ID: " + std::to_string(prob.first) + " P: " + std::to_string(prob.second) + "\n";
+        Print(output.c_str());
     }
 
     double rand = Random();
