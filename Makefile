@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS=-I/usr/local/include -fPIC
+CXXFLAGS=-std=c++20 -I/usr/local/include -fPIC
 LDFLAGS=-L/usr/local/lib -lsimlib -static
 
 # Automatically find all .cpp files in the directory

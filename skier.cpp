@@ -7,6 +7,24 @@
 
 #include "skier.hpp"
 
+Stat slope1Stat("Slope 1 Statistics");
+Stat slope2Stat("Slope 2 Statistics");
+Stat slope3Stat("Slope 3 Statistics");
+Stat slope4Stat("Slope 4 Statistics");
+Stat slope5Stat("Slope 5 Statistics");
+Stat slope6Stat("Slope 6 Statistics");
+Stat slope7Stat("Slope 7 Statistics");
+Stat slope8Stat("Slope 8 Statistics");
+Stat slope9Stat("Slope 9 Statistics");
+Stat slope10Stat("Slope 10 Statistics");
+Stat slope11Stat("Slope 11 Statistics");
+Stat slope12Stat("Slope 12 Statistics");
+Stat slopeRideTime("Slope ride time statistics");
+Stat liftRideTime("Lift ride time statistics");
+Stat slopeRideDuration("Slope ride duration statistics");
+Stat liftRideDuration("Lift ride duration statistics");
+Stat revenue("Revenue");
+
 void Hunger::Behavior()
 {
     double willEat = Random();
@@ -22,12 +40,13 @@ void Hunger::Behavior()
 void Leaving::Behavior()
 {
     ptr->leaving = true;
-    Print("kamo bez domu");
+    //Print("Je cas odejit.");
 }
-
 void Skier::Behavior()
 {
     arrival = Time;
+    lift_ride_dur = 0;
+    slope_ride_dur = 0;
     skier_hunger = new Hunger(this);
     skier_leaving = new Leaving(this);
 
@@ -36,16 +55,18 @@ void Skier::Behavior()
 
     // choose entrypoint
     double lift_choice = Random();
-    if (lift_choice <= PST_AMALKA){
-        currentIntersection = Intersections::getInstance().getIntersectionById(2);
-        entry_point_id = 2;
-    } else if (lift_choice > PST_AMALKA && lift_choice <= PST_AMALKA + PST_USLONA) {
-        currentIntersection = Intersections::getInstance().getIntersectionById(10);
-        entry_point_id = 10;
+
+    if (lift_choice < PST_USLONA) {
+        currentIntersection = Intersections::getInstance().getIntersectionById(5);
+        entry_point_id = 5;
     } else {
         currentIntersection = Intersections::getInstance().getIntersectionById(1);
         entry_point_id = 1;
     }
+
+    double age_choice = Random();
+    int ticket_price = age_choice < PST_CHILDREN ? PRICE_CHILDREN : PRICE_ADULT;
+    revenue(ticket_price);
     // start skiing
     while(!leaving_complete){
 
@@ -53,8 +74,8 @@ void Skier::Behavior()
         {
             if (skier_hunger != nullptr)
             {
-                output = std::to_string(id()) + " Dostal jsem hlad, jdu najit restauraci\n";
-                Print(output.c_str());
+                // output = std::to_string(id()) + " Dostal jsem hlad, jdu najit restauraci\n";
+                // Print(output.c_str());
                 delete skier_hunger;
                 skier_hunger = nullptr;
             }
@@ -62,8 +83,8 @@ void Skier::Behavior()
             std::vector<Store *> restaurants = currentIntersection.restaurants;
             if (restaurants.size() == 0)
             {
-                output = std::to_string(id()) + " Tady neni zadna restaurace, jdu jinam\n";
-                Print(output.c_str());
+                // output = std::to_string(id()) + " Tady neni zadna restaurace, jdu jinam\n";
+                // Print(output.c_str());
             } else{
                 // remove full restaurants
                 restaurants.erase(std::remove_if(restaurants.begin(), restaurants.end(),
@@ -71,22 +92,22 @@ void Skier::Behavior()
 
                 if (restaurants.size() == 0)
                 {
-                    output = std::to_string(id()) + " Vsechny restaurace tady jsou plne, jdu jinam\n";
-                    Print(output.c_str());
+                    // output = std::to_string(id()) + " Vsechny restaurace tady jsou plne, jdu jinam\n";
+                    // Print(output.c_str());
                 } else 
                 {
                     // choose random free restaurant
                     int rand = Random() * restaurants.size();
                     Store *restaurant = restaurants[rand];
                     restaurant->Enter(this, 1);
-                    output = std::to_string(id()) + " Jdu do restaurace " + restaurant->Name() + "\n";
-                    Print(output.c_str());
+                    // output = std::to_string(id()) + " Jdu do restaurace " + restaurant->Name() + "\n";
+                    // Print(output.c_str());
                     double waiting_time = Normal(90*60, 15*60);
 
                     Wait(Normal(90*60, 15*60));
                     restaurant->Leave(1);
-                    output = std::to_string(id()) + " Mnam mnam, bylo to moc dobry, jdu lyzovat dal.\n";
-                    Print(output.c_str()); 
+                    // output = std::to_string(id()) + " Mnam mnam, bylo to moc dobry, jdu lyzovat dal.\n";
+                    // Print(output.c_str()); 
                     hunger = false;
                 }
             }
@@ -96,8 +117,8 @@ void Skier::Behavior()
         if (leaving && currentIntersection.intersectionId == entry_point_id)
         {
             leaving_complete = true;
-            output = std::to_string(id()) + " Dojel jsem tam z kama jsem prisel, odchazim.\n";
-            Print(output.c_str());
+            // output = std::to_string(id()) + " Dojel jsem tam z kama jsem prisel, odchazim.\n";
+            // Print(output.c_str());
         }
     }
     if (skier_hunger != nullptr)
@@ -105,8 +126,9 @@ void Skier::Behavior()
         delete skier_hunger;
         skier_hunger = nullptr;
     }
-
-    table(Time-arrival);
+    liftRideDuration(lift_ride_dur);
+    slopeRideDuration(slope_ride_dur);
+    skiers(Time-arrival);
 }
 
 void Skier::SetSlopeWeights(double slope_difficulty, double slope_possible_lifts, double slope_possible_ways, double slope_special_entertainment, double max_possible_ways_from_lift)
@@ -142,7 +164,7 @@ void Skier::computeIntersectionProbabilities(std::vector<Lift> lifts, std::vecto
     std::map<int, double> prob_lifts;
     std::map<int, double> prob_slopes;
     for (const Lift& lift : lifts) {
-        prob_lifts[lift.liftId] = 0.7 + lift.comfort * skier_weights.lift_comfort + lift.possible_ways * skier_weights.lift_possible_ways/3 + lift.lifts * skier_weights.lift_lift_count + lift.weather * skier_weights.lift_weather;
+        prob_lifts[lift.liftId] = 0.7 + lift.comfort * skier_weights.lift_comfort + lift.possible_ways * skier_weights.lift_possible_ways/3 + lift.lifts * skier_weights.lift_lift_count;
         sum += prob_lifts[lift.liftId];
     }
 
@@ -181,7 +203,7 @@ IntersectionProbs Skier::FilterOptions(IntersectionProbs probs)
     for (const auto& prob: probs.probs)
     {
         int slopeId = prob.first;
-        if (!currentIntersection.slopeLeadsToLeavingPoint(slopeId, leavingPointId))
+        if (!currentIntersection.WayLeadsToLeavingPoint(slopeId, leavingPointId))
         {
             subtract_sum += prob.second - prev_second;
         } else {
@@ -218,8 +240,8 @@ void Skier::makeDecision(){
     }
     for (const auto& prob: probs.probs)
     {
-        output = std::to_string(id()) + " ID: " + std::to_string(prob.first) + " P: " + std::to_string(prob.second) + "\n";
-        Print(output.c_str());
+         //output = std::to_string(id()) + " ID: " + std::to_string(prob.first) + " P: " + std::to_string(prob.second) + "\n";
+         //Print(output.c_str());
     }
 
     double rand = Random();
@@ -229,8 +251,8 @@ void Skier::makeDecision(){
         if (rand <= prob.second)
         {
             currentChoice = prob.first;
-            output = std::to_string(id()) + " Rozhodl jsem se pro ID " + std::to_string(currentChoice) + "\n";
-            Print(output.c_str());
+            // output = std::to_string(id()) + " Rozhodl jsem se pro ID " + std::to_string(currentChoice) + ", prisel jsem z " + std::to_string(entry_point_id) + " a leaving mam na: " + std::to_string(leaving) +"\n";
+            // Print(output.c_str());
             return;
         }
     }
@@ -254,131 +276,110 @@ void Skier::Move()
     switch(currentChoice)
     {
         case 1:
+            slope1Stat(1);
             RideSlope(1);
-            currentIntersection = Intersections::getInstance().getIntersectionById(2);
-            break;
-        case 2:
-            RideSlope(2);
-            currentIntersection = Intersections::getInstance().getIntersectionById(3);
-            break;
-        case 3:
-            RideSlope(3);
-            currentIntersection = Intersections::getInstance().getIntersectionById(3);
-            break;
-        case 4:
-            RideSlope(4);
             currentIntersection = Intersections::getInstance().getIntersectionById(1);
             break;
+        case 2:
+            slope2Stat(1);
+            RideSlope(2);
+            currentIntersection = Intersections::getInstance().getIntersectionById(4);
+            break;
+        case 3:
+            slope3Stat(1);
+            RideSlope(3);
+            currentIntersection = Intersections::getInstance().getIntersectionById(1);
+            break;
+        case 4:
+            slope4Stat(1);
+            RideSlope(4);
+            currentIntersection = Intersections::getInstance().getIntersectionById(2);
+            break;
         case 5:
+            slope5Stat(1);
             RideSlope(5);
             currentIntersection = Intersections::getInstance().getIntersectionById(6);
             break;
         case 6:
+            slope6Stat(1);
             RideSlope(6);
-            currentIntersection = Intersections::getInstance().getIntersectionById(1);
+            currentIntersection = Intersections::getInstance().getIntersectionById(4);
             break;
         case 7:
+            slope7Stat(1);
             RideSlope(7);
-            currentIntersection = Intersections::getInstance().getIntersectionById(7);
+            currentIntersection = Intersections::getInstance().getIntersectionById(5);
             break;
         case 8:
+            slope8Stat(1);
             RideSlope(8);
-            currentIntersection = Intersections::getInstance().getIntersectionById(6);
-            break;
-        case 9:
-            RideSlope(9);
-            currentIntersection = Intersections::getInstance().getIntersectionById(10);
-            break;
-        case 10:
-            RideSlope(10);
-            currentIntersection = Intersections::getInstance().getIntersectionById(8);
-            break;
-        case 11:
-            RideSlope(11);
-            currentIntersection = Intersections::getInstance().getIntersectionById(9);
-            break;
-        case 12:
-            RideSlope(12);
-            currentIntersection = Intersections::getInstance().getIntersectionById(9);
-            break;
-        case 13:
-            RideSlope(13);
-            currentIntersection = Intersections::getInstance().getIntersectionById(9);
-            break;
-        case 14:
-            RideSlope(14);
-            currentIntersection = Intersections::getInstance().getIntersectionById(10);
-            break;
-        case 15:
-            RideSlope(15);
-            currentIntersection = Intersections::getInstance().getIntersectionById(4);
-            break;
-        case 'A':
-            RideLift(&liftA_queue);
             currentIntersection = Intersections::getInstance().getIntersectionById(7);
             break;
+        case 9:
+            slope9Stat(1);
+            RideSlope(9);
+            currentIntersection = Intersections::getInstance().getIntersectionById(8);
+            break;
+        case 10:
+            slope10Stat(1);
+            RideSlope(10);
+            currentIntersection = Intersections::getInstance().getIntersectionById(5);
+            break;
+        case 11:
+            slope11Stat(1);
+            RideSlope(11);
+            currentIntersection = Intersections::getInstance().getIntersectionById(8);
+            break;
+        case 12:
+            slope12Stat(1);
+            RideSlope(12);
+            currentIntersection = Intersections::getInstance().getIntersectionById(8);
+            break;
+        case 'A':
+            liftA_queue_hist(Time);
+            RideLift(&liftA_queue);
+            currentIntersection = Intersections::getInstance().getIntersectionById(6);
+            break;
         case 'B':
+            liftB_queue_hist(Time);
             RideLift(&liftB_queue);
-            currentIntersection = Intersections::getInstance().getIntersectionById(4);
+            currentIntersection = Intersections::getInstance().getIntersectionById(2);
             break;
         case 'C':
             RideLift(&liftC_queue);
-            currentIntersection = Intersections::getInstance().getIntersectionById(11);
+            currentIntersection = Intersections::getInstance().getIntersectionById(9);
             break;
         case 'D':
             RideLift(&liftD_queue);
-            currentIntersection = Intersections::getInstance().getIntersectionById(6);
+            currentIntersection = Intersections::getInstance().getIntersectionById(4);
             break;
         case 'E':
             RideLift(&liftE_queue);
-            currentIntersection = Intersections::getInstance().getIntersectionById(5);
-            break;
-        case 'F':
-            RideLiftF();
-            currentIntersection = Intersections::getInstance().getIntersectionById(12);
+            currentIntersection = Intersections::getInstance().getIntersectionById(3);
             break;
         default:
             break;
     }
 }
 
-void Skier::RideLiftF()
-{
-    Seize(liftF);
-    output = std::to_string(id()) + " Snazim se dostat na Amalku\n";
-    Print(output.c_str());
-      
-    bool fail = true;
-    while(fail){
-        if (Random() >= 0.2){
-          fail = false;
-          output = std::to_string(id()) + " Povedlo se mi dostat na Amalku\n";
-          Print(output.c_str());
-        } else {                          // failed to get on the lift
-          output = std::to_string(id()) + " Jsem blb a spadl jsem, zkousim to znovu\n";
-          Print(output.c_str());
-        }
-        Wait(6);
-    }
-    Release(liftF); 
-    Wait(48);
-    output = std::to_string(id()) + " Dojel jsem nahoru na Amalce\n";
-    Print(output.c_str());
-}
-
 void Skier::RideSlope(int slopeId)
 {
+    double slope_start = Time;
     int time = currentIntersection.GetTimeToCrossById(slopeId);
     Wait(round(time/skier_speed_coefficient));
-    output = std::to_string(id()) + " Sjezd\n";
-    Print(output.c_str());
+    // output = std::to_string(id()) + " Sjezd\n";
+    // Print(output.c_str());
+    slope_ride_dur += Time - slope_start;
+    slopeRideTime(Time - slope_start);
 }
 
 void Skier::RideLift(Queue *queue)
 {
+    double lift_start = Time;
     queue->Insert(this);
     Passivate();
-    output = std::to_string(id()) + " Vyjel jsem!\n";
-    Print(output.c_str());
-
+    // output = std::to_string(id()) + " Vyjel jsem!\n";
+    // Print(output.c_str());
+    lift_ride_dur += Time - lift_start;
+    liftRideTime(Time - lift_start);
 }

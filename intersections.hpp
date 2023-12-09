@@ -13,10 +13,13 @@
 #include <vector>
 #include <map>
 #include "simlib.h"
+#include "restaurant.hpp"
 
 #define DIFFICULTY_RED 1.0
 #define DIFFICULTY_BLUE 0.3
 #define DIFFICULTY_BLACK 0.2
+
+extern bool is_attraction;
 
 struct Slope {
   int slopeId;
@@ -40,7 +43,6 @@ struct Lift {
   int comfort;
   int possible_ways;
   int lifts;
-  int weather;
   std::vector<int> way_to_leaving_points_ids;
 };
 
@@ -61,7 +63,7 @@ public:
 
     int GetTimeToCrossById(int id);
 
-    bool slopeLeadsToLeavingPoint(int slopeId, int leavingPointId);
+    bool WayLeadsToLeavingPoint(int slopeId, int leavingPointId);
 
 };
 

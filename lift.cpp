@@ -7,65 +7,59 @@
 
 #include "lift.hpp"
 
-Facility  liftF("Lift F");
 Queue liftB_queue("Lift B Queue");
 Queue liftA_queue("Lift A Queue");
 Queue liftC_queue("Lift C Queue");
 Queue liftD_queue("Lift D Queue");
 Queue liftE_queue("Lift E Queue");
-Histogram table("Table",0,25,20);
+Histogram skiers("Skiers time in system histogram",0,10*60, CLOSING_TIME/(10*60));
+Histogram liftA_queue_hist("Lift A Queue Histogram",0,10*60, CLOSING_TIME/(10*60));
+Histogram liftB_queue_hist("Lift B Queue Histogram",0,10*60, CLOSING_TIME/(10*60));
+int liftA_capacity = 4;
+int liftB_capacity = 4;
+double speed = 1.0;
 
 void BoardingLiftB::Behavior(){
-    Arrival = Time;
-    process_chairlift(278, &liftB_queue);
-    table(Time-Arrival);
+    process_chairlift(430/speed, &liftB_queue, liftB_capacity);
 };
 
 void BoardingLiftA::Behavior(){
-    Arrival = Time;
-    process_chairlift(450, &liftA_queue);
-    table(Time-Arrival);
+    process_chairlift(440/speed, &liftA_queue, liftA_capacity);
 };
 
 void BoardingLiftC::Behavior(){
-    Arrival = Time;
-    process_tbar(240, &liftC_queue);
-    table(Time-Arrival);
+    process_tbar(200, &liftC_queue);
 };
 
 void BoardingLiftD::Behavior(){
-    Arrival = Time;
-    process_tbar(240, &liftD_queue);
-    table(Time-Arrival);
+    process_tbar(200, &liftD_queue);
 };
 
 void BoardingLiftE::Behavior(){
-    Arrival = Time;
-    process_tbar(315, &liftE_queue);
-    table(Time-Arrival);
+    process_tbar(80, &liftE_queue);
 };
 
-void Board::process_chairlift(int time, Queue *queue){
+void Board::process_chairlift(int time, Queue *queue, int capacity){
     int skiers_count;
     std::string log;
-    Entity *skiers_on_chairlift[SEATS_CHAIRLIFT];
+    Entity *skiers_on_chairlift[capacity];
     if (queue->Length() > 50)
     {
-      skiers_count = 4;
+      skiers_count = capacity;
     } else {
-      skiers_count = (int)Uniform(1,5);
+      skiers_count = (int)Uniform(1,capacity+1);
     }
     if (queue->empty()){
-      log = "Ve fronte je 0 lyzaru, lanovka odjizdi prazdna\n";
+      //log = "Ve fronte je 0 lyzaru, lanovka odjizdi prazdna\n";
       skiers_count = 0;
-      Print(log.c_str());
+      //Print(log.c_str());
     } else if (queue->Length() < skiers_count){
-      log = "Nastupuje " + std::to_string(queue->Length()) + " lyzaru\n";
-      Print(log.c_str());
+      //log = "Nastupuje " + std::to_string(queue->Length()) + " lyzaru\n";
+      //Print(log.c_str());
       skiers_count = queue->Length();
     } else {
-      log = "Nastupuje " + std::to_string(skiers_count) + " lyzaru\n";
-      Print(log.c_str());
+      //log = "Nastupuje " + std::to_string(skiers_count) + " lyzaru\n";
+      //Print(log.c_str());
     }
 
     for (int i = 0; i < skiers_count; i++){
@@ -88,16 +82,16 @@ void  Board::process_tbar(int time, Queue *queue){
       skiers_count = (int)Uniform(1,3);
     }
     if (queue->empty()){
-      log = "Ve fronte je 0 lyzaru, kotva odjizdi prazdna\n";
+      //log = "Ve fronte je 0 lyzaru, kotva odjizdi prazdna\n";
       skiers_count = 0;
-      Print(log.c_str());
+      //Print(log.c_str());
     } else if (queue->Length() < skiers_count){
-      log = "Nastupuje " + std::to_string(queue->Length()) + " lyzaru\n";
-      Print(log.c_str());
+      //log = "Nastupuje " + std::to_string(queue->Length()) + " lyzaru\n";
+      //Print(log.c_str());
       skiers_count = queue->Length();
     } else {
-      log = "Nastupuje " + std::to_string(skiers_count) + " lyzaru\n";
-      Print(log.c_str());
+      //log = "Nastupuje " + std::to_string(skiers_count) + " lyzaru\n";
+      //Print(log.c_str());
     }
 
     for (int i = 0; i < skiers_count; i++){

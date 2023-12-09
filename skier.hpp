@@ -18,27 +18,47 @@
 #include "intersections.hpp"
 #include "restaurant.hpp"
 
-#define PST_AMALKA 0.05
-#define PST_MARCELKA 0.65
+#define PST_MARCELKA 0.7
 #define PST_USLONA 0.3
+
+#define PST_ADULT 0.785
+#define PST_CHILDREN 0.215
 
 #define LEVEL_BEGINNER 0.15
 #define LEVEL_INTERMEDIATE 0.55
 #define LEVEL_ADVANCED 0.3
 
-#define CLOSING_TIME 450*60
+#define PRICE_ADULT 1140
+#define PRICE_CHILDREN 745
+
+extern Stat slope1Stat;
+extern Stat slope2Stat;
+extern Stat slope3Stat;
+extern Stat slope4Stat;
+extern Stat slope5Stat;
+extern Stat slope6Stat;
+extern Stat slope7Stat;
+extern Stat slope8Stat;
+extern Stat slope9Stat;
+extern Stat slope10Stat;
+extern Stat slope11Stat;
+extern Stat slope12Stat;
+extern Stat slopeRideTime;
+extern Stat liftRideTime;
+extern Stat slopeRideDuration;
+extern Stat liftRideDuration;
+extern Stat revenue;
 
 struct Weights {
   double lift_comfort = 0.15;
   double lift_possible_ways = 0.28;
   double lift_lift_count = 0.07;
-  double lift_weather = -0.05;
 
-  double slope_difficulty = 0.2;
+  double slope_difficulty = 0.15;
   double slope_possible_lifts = 0.10;
   double slope_possible_ways = 0.20;
   double slope_special_entertainment = 0.05;
-  double slope_max_possible_ways_from_lift = 0.45; 
+  double slope_max_possible_ways_from_lift = 0.5; 
 };
 
 struct IntersectionProbs {
@@ -61,6 +81,8 @@ public:
   int currentChoice;
   std::map<int, IntersectionProbs> intersectionsProbs;
   double skier_speed_coefficient = 1.0;
+  double slope_ride_dur;
+  double lift_ride_dur;
 
   void Behavior();
   IntersectionProbs FilterOptions(IntersectionProbs probs);
@@ -69,7 +91,6 @@ public:
   void GoToAmalka();
   void GoToMarcelka();
   void GoToUSlona();
-
   void SetSlopeWeights(double slope_difficulty, double slope_possible_lifts, double slope_possible_ways, double slope_special_entertainment, double max_possible_ways_from_lift);
   void SetSkierLevel();
   void computeIntersectionProbabilities(std::vector<Lift> lifts, std::vector<Slope> slopes, std::vector<std::pair<int, double>> *cumulativeDist);
