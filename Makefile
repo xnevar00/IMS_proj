@@ -21,3 +21,6 @@ program: $(OBJECTS)
 
 clean:
 	rm *.o
+
+run: program
+	./program -p 1000

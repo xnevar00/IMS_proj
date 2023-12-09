@@ -37,7 +37,6 @@ class SkierGenerator : public Event {
   void Behavior() {
     static int index = 0;
     (new Skier)->Activate();
-    //Print("vytvarim lyzare cislo %d\n", index);
     if (index < event_times.size())
     {
         Activate(Time+event_times[index++]);

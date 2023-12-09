@@ -40,7 +40,6 @@ void Hunger::Behavior()
 void Leaving::Behavior()
 {
     ptr->leaving = true;
-    //Print("Je cas odejit.");
 }
 void Skier::Behavior()
 {
@@ -74,40 +73,27 @@ void Skier::Behavior()
         {
             if (skier_hunger != nullptr)
             {
-                // output = std::to_string(id()) + " Dostal jsem hlad, jdu najit restauraci\n";
-                // Print(output.c_str());
                 delete skier_hunger;
                 skier_hunger = nullptr;
             }
             // get all the restaurants at current intersection
             std::vector<Store *> restaurants = currentIntersection.restaurants;
-            if (restaurants.size() == 0)
+            if (restaurants.size() != 0)
             {
-                // output = std::to_string(id()) + " Tady neni zadna restaurace, jdu jinam\n";
-                // Print(output.c_str());
-            } else{
                 // remove full restaurants
                 restaurants.erase(std::remove_if(restaurants.begin(), restaurants.end(),
                 [](const Store* store) { return store->Full(); }), restaurants.end());
 
-                if (restaurants.size() == 0)
-                {
-                    // output = std::to_string(id()) + " Vsechny restaurace tady jsou plne, jdu jinam\n";
-                    // Print(output.c_str());
-                } else 
+                if (restaurants.size() != 0)
                 {
                     // choose random free restaurant
                     int rand = Random() * restaurants.size();
                     Store *restaurant = restaurants[rand];
                     restaurant->Enter(this, 1);
-                    // output = std::to_string(id()) + " Jdu do restaurace " + restaurant->Name() + "\n";
-                    // Print(output.c_str());
                     double waiting_time = Normal(90*60, 15*60);
 
                     Wait(Normal(90*60, 15*60));
                     restaurant->Leave(1);
-                    // output = std::to_string(id()) + " Mnam mnam, bylo to moc dobry, jdu lyzovat dal.\n";
-                    // Print(output.c_str()); 
                     hunger = false;
                 }
             }
@@ -117,8 +103,6 @@ void Skier::Behavior()
         if (leaving && currentIntersection.intersectionId == entry_point_id)
         {
             leaving_complete = true;
-            // output = std::to_string(id()) + " Dojel jsem tam z kama jsem prisel, odchazim.\n";
-            // Print(output.c_str());
         }
     }
     if (skier_hunger != nullptr)
@@ -238,11 +222,6 @@ void Skier::makeDecision(){
             probs = intersectionsProbs[currentIntersection.intersectionId];
         }
     }
-    for (const auto& prob: probs.probs)
-    {
-         //output = std::to_string(id()) + " ID: " + std::to_string(prob.first) + " P: " + std::to_string(prob.second) + "\n";
-         //Print(output.c_str());
-    }
 
     double rand = Random();
 
@@ -251,8 +230,6 @@ void Skier::makeDecision(){
         if (rand <= prob.second)
         {
             currentChoice = prob.first;
-            // output = std::to_string(id()) + " Rozhodl jsem se pro ID " + std::to_string(currentChoice) + ", prisel jsem z " + std::to_string(entry_point_id) + " a leaving mam na: " + std::to_string(leaving) +"\n";
-            // Print(output.c_str());
             return;
         }
     }
@@ -367,8 +344,6 @@ void Skier::RideSlope(int slopeId)
     double slope_start = Time;
     int time = currentIntersection.GetTimeToCrossById(slopeId);
     Wait(round(time/skier_speed_coefficient));
-    // output = std::to_string(id()) + " Sjezd\n";
-    // Print(output.c_str());
     slope_ride_dur += Time - slope_start;
     slopeRideTime(Time - slope_start);
 }
@@ -378,8 +353,6 @@ void Skier::RideLift(Queue *queue)
     double lift_start = Time;
     queue->Insert(this);
     Passivate();
-    // output = std::to_string(id()) + " Vyjel jsem!\n";
-    // Print(output.c_str());
     lift_ride_dur += Time - lift_start;
     liftRideTime(Time - lift_start);
 }

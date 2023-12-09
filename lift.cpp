@@ -50,16 +50,9 @@ void Board::process_chairlift(int time, Queue *queue, int capacity){
       skiers_count = (int)Uniform(1,capacity+1);
     }
     if (queue->empty()){
-      //log = "Ve fronte je 0 lyzaru, lanovka odjizdi prazdna\n";
       skiers_count = 0;
-      //Print(log.c_str());
     } else if (queue->Length() < skiers_count){
-      //log = "Nastupuje " + std::to_string(queue->Length()) + " lyzaru\n";
-      //Print(log.c_str());
       skiers_count = queue->Length();
-    } else {
-      //log = "Nastupuje " + std::to_string(skiers_count) + " lyzaru\n";
-      //Print(log.c_str());
     }
 
     for (int i = 0; i < skiers_count; i++){
@@ -82,16 +75,9 @@ void  Board::process_tbar(int time, Queue *queue){
       skiers_count = (int)Uniform(1,3);
     }
     if (queue->empty()){
-      //log = "Ve fronte je 0 lyzaru, kotva odjizdi prazdna\n";
       skiers_count = 0;
-      //Print(log.c_str());
     } else if (queue->Length() < skiers_count){
-      //log = "Nastupuje " + std::to_string(queue->Length()) + " lyzaru\n";
-      //Print(log.c_str());
       skiers_count = queue->Length();
-    } else {
-      //log = "Nastupuje " + std::to_string(skiers_count) + " lyzaru\n";
-      //Print(log.c_str());
     }
 
     for (int i = 0; i < skiers_count; i++){
